@@ -1,3 +1,10 @@
+# Checkpoints
+data-bin
+checkpoints
+logs
+*.ipynb
+runs
+
 # Repo-specific GitIgnore ----------------------------------------------------------------------------------------------
 *.jpg
 *.jpeg
