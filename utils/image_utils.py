@@ -74,11 +74,12 @@ def anchor_match_visualize(images, targets, indices, anchors, pred):
     images = decode_image(images)
 
     strdie = [8, 16, 32]
+
+    images_with_anchor = []
     # 对每张图片进行可视化
     for j in range(images.shape[0]):
         img = images[j].astype(np.uint8)[..., ::-1]
 
-        # img = VisualHelper.show_bbox(img.copy(), y1, color=(255, 255, 255), is_show=False, thickness=2)
         # 对每个预测尺度进行单独可视化
         vis_imgs = []
         for i in range(3):  # i=0 检测小物体，i=1 检测中等尺度物体，i=2 检测大物体
@@ -121,7 +122,10 @@ def anchor_match_visualize(images, targets, indices, anchors, pred):
             img = show_bbox(img, anchor_bbox, color=(0, 255, 255), is_show=False)
             vis_imgs.append(img)
 
-        show_img(vis_imgs, is_merge=True)
+        per_image_with_anchor = merge_images_with_boundary(vis_imgs)
+        images_with_anchor.append(per_image_with_anchor)
+
+    return images_with_anchor
 
 
 def show_bbox(image, bboxs_list, color=None,
@@ -193,11 +197,11 @@ def show_bbox(image, bboxs_list, color=None,
                 lineType=cv2.LINE_AA,
             )
     if is_show:
-        show_img(image_copy, names, wait_time_ms)
+        merge_images_with_boundary(image_copy)
     return image_copy
 
 
-def show_img(imgs, window_names=None, wait_time_ms=0, is_merge=False, row_col_num=(1, -1)):
+def merge_images_with_boundary(imgs, row_col_num=(1, -1)):
     """
         Displays an image or a list of images in specified windows or self-initiated windows.
         You can also control display wait time by parameter 'wait_time_ms'.
@@ -216,30 +220,11 @@ def show_img(imgs, window_names=None, wait_time_ms=0, is_merge=False, row_col_nu
     if not isinstance(imgs, list):
         imgs = [imgs]
 
-    if window_names is None:
-        window_names = list(range(len(imgs)))
-    else:
-        if not isinstance(window_names, list):
-            window_names = [window_names]
-        assert len(imgs) == len(window_names), 'window names does not match images!'
-
-    if is_merge:
-        merge_imgs1 = merge_imgs(imgs, row_col_num)
-
-        cv2.namedWindow('merge', 0)
-        cv2.imshow('merge', merge_imgs1)
-    else:
-        for img, win_name in zip(imgs, window_names):
-            if img is None:
-                continue
-            win_name = str(win_name)
-            cv2.namedWindow(win_name, 0)
-            cv2.imshow(win_name, img)
-
-    cv2.waitKey(wait_time_ms)
+    img_merged = merge_images(imgs, row_col_num)
+    return img_merged
 
 
-def merge_imgs(imgs, row_col_num):
+def merge_images(imgs, row_col_num):
     """
         Merges all input images as an image with specified merge format.
 
@@ -259,9 +244,9 @@ def merge_imgs(imgs, row_col_num):
         cv2.rectangle(img, (0, 0), (img.shape[1], img.shape[0]), color)
 
     if row_col_num[1] < 0 or length < row:
-        merge_imgs = np.hstack(imgs)
+        img_merged = np.hstack(imgs)
     elif row_col_num[0] < 0 or length < col:
-        merge_imgs = np.vstack(imgs)
+        img_merged = np.vstack(imgs)
     else:
         assert row * col >= length, 'Imgs overboundary, not enough windows to display all imgs!'
 
@@ -274,6 +259,6 @@ def merge_imgs(imgs, row_col_num):
             merge_col = np.hstack(imgs[start: end])
             merge_imgs_col.append(merge_col)
 
-        merge_imgs = np.vstack(merge_imgs_col)
+        img_merged = np.vstack(merge_imgs_col)
 
-    return merge_imgs
+    return img_merged
