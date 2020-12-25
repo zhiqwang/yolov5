@@ -1,15 +1,12 @@
 import argparse
 import logging
-import sys
+
 from copy import deepcopy
 from pathlib import Path
 
 import math
 import torch
 import torch.nn as nn
-
-sys.path.append('./')  # to run '$ python *.py' files in subdirectories
-logger = logging.getLogger(__name__)
 
 from models.common import Conv, Bottleneck, SPP, DWConv, Focus, BottleneckCSP, Concat, NMS, autoShape
 from models.experimental import MixConv2d, CrossConv, C3
@@ -22,6 +19,8 @@ try:
     import thop  # for FLOPS computation
 except ImportError:
     thop = None
+
+logger = logging.getLogger(__name__)
 
 
 class Detect(nn.Module):

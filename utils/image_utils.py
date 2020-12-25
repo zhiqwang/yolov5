@@ -69,14 +69,14 @@ def to_numpy(tensor):
         return tensor.cpu().numpy()
 
 
-def anchor_match_visualize(imgs, targets, indices, anchors, pred):
-    h, w = imgs.shape[-2:]
-    imgs = decode_image(imgs)
+def anchor_match_visualize(images, targets, indices, anchors, pred):
+    h, w = images.shape[-2:]
+    images = decode_image(images)
 
     strdie = [8, 16, 32]
     # 对每张图片进行可视化
-    for j in range(imgs.shape[0]):
-        img = imgs[j].astype(np.uint8)[..., ::-1]
+    for j in range(images.shape[0]):
+        img = images[j].astype(np.uint8)[..., ::-1]
 
         # img = VisualHelper.show_bbox(img.copy(), y1, color=(255, 255, 255), is_show=False, thickness=2)
         # 对每个预测尺度进行单独可视化
@@ -85,7 +85,7 @@ def anchor_match_visualize(imgs, targets, indices, anchors, pred):
             s = strdie[i]
             # anchor尺度
             gain = np.array(pred[i].shape)[[3, 2, 3, 2]]
-            b, a, grid_x, grid_y = indices[i]
+            b, _, grid_x, grid_y = indices[i]
 
             b = to_numpy(b)
             grid_x = to_numpy(grid_x)
